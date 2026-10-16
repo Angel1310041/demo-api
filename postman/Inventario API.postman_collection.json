@@ -6,7 +6,6 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:8080" },
     { "key": "categoriaId", "value": "1" },
     { "key": "proveedorId", "value": "1" },
     { "key": "productoId", "value": "1" }
@@ -18,11 +17,11 @@
         {
           "name": "Crear categoría",
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('categoriaId', pm.response.json().id);"] } }],
-          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Periféricos\",\"descripcion\":\"Accesorios de computadora\"}" }, "url": { "raw": "{{baseUrl}}/api/categorias" } }
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Periféricos\",\"descripcion\":\"Accesorios de computadora\"}" }, "url": { "raw": "http://localhost:8080/api/categorias" } }
         },
-        { "name": "Listar categorías", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/categorias" } } },
-        { "name": "Consultar categoría", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}" } } },
-        { "name": "Actualizar categoría", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Periféricos y audio\",\"descripcion\":\"Accesorios\"}" }, "url": { "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}" } } }
+        { "name": "Listar categorías", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/categorias" } } },
+        { "name": "Consultar categoría", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/categorias/{{categoriaId}}" } } },
+        { "name": "Actualizar categoría", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Periféricos y audio\",\"descripcion\":\"Accesorios\"}" }, "url": { "raw": "http://localhost:8080/api/categorias/{{categoriaId}}" } } }
       ]
     },
     {
@@ -31,11 +30,11 @@
         {
           "name": "Crear proveedor",
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('proveedorId', pm.response.json().id);"] } }],
-          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Tech SA\",\"email\":\"ventas@tech.test\",\"telefono\":\"5551234\"}" }, "url": { "raw": "{{baseUrl}}/api/proveedores" } }
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Tech SA\",\"email\":\"ventas@tech.test\",\"telefono\":\"5551234\"}" }, "url": { "raw": "http://localhost:8080/api/proveedores" } }
         },
-        { "name": "Listar proveedores", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/proveedores" } } },
-        { "name": "Consultar proveedor", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/proveedores/{{proveedorId}}" } } },
-        { "name": "Actualizar proveedor", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Tech Global\",\"email\":\"ventas@tech.test\",\"telefono\":\"5551234\"}" }, "url": { "raw": "{{baseUrl}}/api/proveedores/{{proveedorId}}" } } }
+        { "name": "Listar proveedores", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/proveedores" } } },
+        { "name": "Consultar proveedor", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/proveedores/{{proveedorId}}" } } },
+        { "name": "Actualizar proveedor", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Tech Global\",\"email\":\"ventas@tech.test\",\"telefono\":\"5551234\"}" }, "url": { "raw": "http://localhost:8080/api/proveedores/{{proveedorId}}" } } }
       ]
     },
     {
@@ -44,17 +43,17 @@
         {
           "name": "Crear producto",
           "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.collectionVariables.set('productoId', pm.response.json().id);"] } }],
-          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Teclado\",\"descripcion\":\"Mecánico\",\"precio\":25.50,\"stock\":10,\"categoriaId\":{{categoriaId}},\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "{{baseUrl}}/api/productos" } }
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Teclado\",\"descripcion\":\"Mecánico\",\"precio\":25.50,\"stock\":10,\"categoriaId\":{{categoriaId}},\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "http://localhost:8080/api/productos" } }
         },
-        { "name": "Intentar borrar categoría referenciada (409)", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}" } } },
-        { "name": "Intentar borrar proveedor referenciado (409)", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/proveedores/{{proveedorId}}" } } },
-        { "name": "Listar productos", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/productos" } } },
-        { "name": "Consultar producto", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}" } } },
-        { "name": "Actualizar producto", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Teclado mecánico\",\"descripcion\":\"Mecánico\",\"precio\":29.90,\"stock\":8,\"categoriaId\":{{categoriaId}},\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}" } } },
-        { "name": "Referencia inválida (404)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Producto inválido\",\"precio\":1,\"stock\":1,\"categoriaId\":999999,\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "{{baseUrl}}/api/productos" } } },
-        { "name": "Borrar producto", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/productos/{{productoId}}" } } },
-        { "name": "Borrar categoría", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/categorias/{{categoriaId}}" } } },
-        { "name": "Borrar proveedor", "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/proveedores/{{proveedorId}}" } } }
+        { "name": "Intentar borrar categoría referenciada (409)", "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/categorias/{{categoriaId}}" } } },
+        { "name": "Intentar borrar proveedor referenciado (409)", "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/proveedores/{{proveedorId}}" } } },
+        { "name": "Listar productos", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/productos" } } },
+        { "name": "Consultar producto", "request": { "method": "GET", "url": { "raw": "http://localhost:8080/api/productos/{{productoId}}" } } },
+        { "name": "Actualizar producto", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Teclado mecánico\",\"descripcion\":\"Mecánico\",\"precio\":29.90,\"stock\":8,\"categoriaId\":{{categoriaId}},\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "http://localhost:8080/api/productos/{{productoId}}" } } },
+        { "name": "Referencia inválida (404)", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"nombre\":\"Producto inválido\",\"precio\":1,\"stock\":1,\"categoriaId\":999999,\"proveedorId\":{{proveedorId}}}" }, "url": { "raw": "http://localhost:8080/api/productos" } } },
+        { "name": "Borrar producto", "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/productos/{{productoId}}" } } },
+        { "name": "Borrar categoría", "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/categorias/{{categoriaId}}" } } },
+        { "name": "Borrar proveedor", "request": { "method": "DELETE", "url": { "raw": "http://localhost:8080/api/proveedores/{{proveedorId}}" } } }
       ]
     }
   ]
