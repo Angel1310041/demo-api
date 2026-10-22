@@ -10,8 +10,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -52,6 +54,35 @@ class DemoApplicationTests {
 		mockMvc.perform(delete("/api/categorias/1")).andExpect(status().isNoContent());
 		mockMvc.perform(delete("/api/proveedores/1")).andExpect(status().isNoContent());
 		mockMvc.perform(get("/api/productos/999")).andExpect(status().isNotFound());
+	}
+
+	@Test
+	void autenticacionYDerechosArcoRequierenCredencialesYOperanSobreElUsuarioActual() throws Exception {
+		String credentials = "{\"username\":\"arco-user\",\"password\":\"ClaveSegura123!\","
+				+ "\"nombreCompleto\":\"Usuario de Prueba\",\"email\":\"arco-user@example.test\","
+				+ "\"telefono\":\"5551234\",\"domicilio\":\"Calle Uno\"}";
+
+		mockMvc.perform(post("/api/auth/registro").contentType(MediaType.APPLICATION_JSON).content(credentials))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.username").value("arco-user"))
+				.andExpect(jsonPath("$.passwordHash").doesNotExist());
+		mockMvc.perform(get("/api/arco/perfil")).andExpect(status().isUnauthorized());
+		mockMvc.perform(post("/api/auth/login").with(httpBasic("arco-user", "ClaveSegura123!")))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.mensaje").value("Autenticación correcta"));
+		mockMvc.perform(get("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.email").value("arco-user@example.test"));
+		mockMvc.perform(put("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!"))
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("{\"nombreCompleto\":\"Usuario Rectificado\",\"email\":\"arco-user@example.test\","
+						+ "\"telefono\":\"5559999\",\"domicilio\":\"Calle Dos\"}"))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.nombreCompleto").value("Usuario Rectificado"));
+		mockMvc.perform(patch("/api/arco/oposicion").with(httpBasic("arco-user", "ClaveSegura123!"))
+				.contentType(MediaType.APPLICATION_JSON).content("{\"oposicionAlTratamiento\":true}"))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.oposicionAlTratamiento").value(true));
+		mockMvc.perform(delete("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
+				.andExpect(status().isNoContent());
+		mockMvc.perform(get("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
+				.andExpect(status().isUnauthorized());
 	}
 
 	private String productoJson(String nombre, long categoriaId, long proveedorId) {

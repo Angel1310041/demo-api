@@ -1,0 +1,93 @@
+{
+  "info": {
+    "_postman_id": "16c67d92-30db-43f0-bfb0-73bd36c97250",
+    "name": "API de autenticación y derechos ARCO",
+    "description": "Registro, login HTTP Basic y derechos ARCO del usuario autenticado.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{arcoUsername}}", "type": "string" },
+      { "key": "password", "value": "{{arcoPassword}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "arcoUsername", "value": "" },
+    { "key": "arcoPassword", "value": "" },
+    { "key": "arcoEmail", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "1. Registrar usuario",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{arcoUsername}}\",\n  \"password\": \"{{arcoPassword}}\",\n  \"nombreCompleto\": \"Usuario de prueba\",\n  \"email\": \"{{arcoEmail}}\",\n  \"telefono\": \"5551234\",\n  \"domicilio\": \"Calle de prueba 123\"\n}"
+            },
+            "url": "http://localhost:8080/api/auth/registro"
+          }
+        },
+        {
+          "name": "2. Login HTTP Basic",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "http://localhost:8080/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Derechos ARCO (autenticados)",
+      "auth": {
+        "type": "basic",
+        "basic": [
+          { "key": "username", "value": "{{arcoUsername}}", "type": "string" },
+          { "key": "password", "value": "{{arcoPassword}}", "type": "string" }
+        ]
+      },
+      "item": [
+        {
+          "name": "A. Acceso: consultar mi perfil",
+          "request": { "method": "GET", "url": "http://localhost:8080/api/arco/perfil" }
+        },
+        {
+          "name": "R. Rectificación: actualizar mis datos",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreCompleto\": \"Usuario rectificado\",\n  \"email\": \"{{arcoEmail}}\",\n  \"telefono\": \"5559999\",\n  \"domicilio\": \"Nuevo domicilio 456\"\n}"
+            },
+            "url": "http://localhost:8080/api/arco/perfil"
+          }
+        },
+        {
+          "name": "O. Oposición: oponerme al tratamiento",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\"oposicionAlTratamiento\":true}" },
+            "url": "http://localhost:8080/api/arco/oposicion"
+          }
+        },
+        {
+          "name": "Verificar oposición registrada",
+          "request": { "method": "GET", "url": "http://localhost:8080/api/arco/perfil" }
+        },
+        {
+          "name": "C. Cancelación: eliminar mi cuenta (irreversible)",
+          "request": { "method": "DELETE", "url": "http://localhost:8080/api/arco/perfil" }
+        }
+      ]
+    }
+  ]
+}
