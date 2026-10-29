@@ -2,21 +2,18 @@
   "info": {
     "_postman_id": "16c67d92-30db-43f0-bfb0-73bd36c97250",
     "name": "API de autenticación y derechos ARCO",
-    "description": "Registro, login HTTP Basic y derechos ARCO del usuario autenticado.",
+    "description": "Registro, emisión de JWT en el login y derechos ARCO protegidos con Bearer token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
-    "type": "basic",
-    "basic": [
-      { "key": "username", "value": "{{arcoUsername}}", "type": "string" },
-      { "key": "password", "value": "{{arcoPassword}}", "type": "string" }
-    ]
+    "type": "noauth"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://inventario.uttec" },
     { "key": "arcoUsername", "value": "" },
     { "key": "arcoPassword", "value": "" },
-    { "key": "arcoEmail", "value": "" }
+    { "key": "arcoEmail", "value": "" },
+    { "key": "accessToken", "value": "" }
   ],
   "item": [
     {
@@ -36,22 +33,35 @@
           }
         },
         {
-          "name": "2. Login HTTP Basic",
+          "name": "2. Login y obtener Bearer token",
           "request": {
             "method": "POST",
-            "header": [],
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{arcoUsername}}\",\n  \"password\": \"{{arcoPassword}}\"\n}"
+            },
             "url": "{{baseUrl}}/api/auth/login"
-          }
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.collectionVariables.set('accessToken', pm.response.json().accessToken);"
+              ]
+            }
+          }]
         }
       ]
     },
     {
       "name": "Derechos ARCO (autenticados)",
       "auth": {
-        "type": "basic",
-        "basic": [
-          { "key": "username", "value": "{{arcoUsername}}", "type": "string" },
-          { "key": "password", "value": "{{arcoPassword}}", "type": "string" }
+        "type": "bearer",
+        "bearer": [
+          { "key": "token", "value": "{{accessToken}}", "type": "string" }
         ]
       },
       "item": [

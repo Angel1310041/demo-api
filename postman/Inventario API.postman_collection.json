@@ -42,7 +42,13 @@
         {
           "name": "Iniciar sesión",
           "request": {
+            "auth": { "type": "noauth" },
             "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"{{username}}\",\"password\":\"{{password}}\"}"
+            },
             "url": { "raw": "{{baseUrl}}/api/auth/login" }
           }
         }

@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.isEmptyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -22,7 +24,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource(properties = "spring.datasource.url=jdbc:h2:mem:inventario-test;DB_CLOSE_DELAY=-1")
+@TestPropertySource(properties = {
+		"spring.datasource.url=jdbc:h2:mem:inventario-test;DB_CLOSE_DELAY=-1",
+		"app.jwt.secret=MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+})
 class DemoApplicationTests {
 	@Autowired
 	private MockMvc mockMvc;
@@ -105,7 +110,7 @@ class DemoApplicationTests {
 	}
 
 	@Test
-	void autenticacionYDerechosArcoRequierenCredencialesYOperanSobreElUsuarioActual() throws Exception {
+	void derechosArcoRequierenBearerTokenEmitidoAlIniciarSesion() throws Exception {
 		mockMvc.perform(get("/api/categorias")).andExpect(status().isUnauthorized());
 
 		String credentials = "{\"username\":\"arco-user\",\"password\":\"ClaveSegura123!\","
@@ -121,22 +126,40 @@ class DemoApplicationTests {
 						+ "\"nombreCompleto\":\"Otro Usuario\",\"email\":\"otro@example.test\"}"))
 				.andExpect(status().isForbidden());
 		mockMvc.perform(get("/api/arco/perfil")).andExpect(status().isUnauthorized());
-		mockMvc.perform(post("/api/auth/login").with(httpBasic("arco-user", "ClaveSegura123!")))
-				.andExpect(status().isOk()).andExpect(jsonPath("$.mensaje").value("Autenticación correcta"));
 		mockMvc.perform(get("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
+				.andExpect(status().isUnauthorized());
+		mockMvc.perform(get("/api/arco/perfil").header("Authorization", "Bearer invalid.token.value"))
+				.andExpect(status().isUnauthorized());
+
+		String loginBody = "{\"username\":\"arco-user\",\"password\":\"ClaveSegura123!\"}";
+		String loginResponse = mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+				.content(loginBody))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.mensaje").value("Autenticación correcta"))
+				.andExpect(jsonPath("$.tipoToken").value("Bearer"))
+				.andExpect(jsonPath("$.accessToken", not(isEmptyString())))
+				.andExpect(jsonPath("$.usuario.passwordHash").doesNotExist())
+				.andReturn().getResponse().getContentAsString();
+		String token = loginResponse.replaceFirst("(?s).*\"accessToken\":\"([^\"]+)\".*", "$1");
+		String bearer = "Bearer " + token;
+
+		mockMvc.perform(post("/api/auth/login").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"username\":\"arco-user\",\"password\":\"incorrecta\"}"))
+				.andExpect(status().isUnauthorized());
+		mockMvc.perform(get("/api/arco/perfil").header("Authorization", bearer))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.email").value("arco-user@example.test"));
-		mockMvc.perform(put("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!"))
+		mockMvc.perform(put("/api/arco/perfil").header("Authorization", bearer)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content("{\"nombreCompleto\":\"Usuario Rectificado\",\"email\":\"arco-user@example.test\","
 						+ "\"telefono\":\"5559999\",\"domicilio\":\"Calle Dos\"}"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.nombreCompleto").value("Usuario Rectificado"));
-		mockMvc.perform(patch("/api/arco/oposicion").with(httpBasic("arco-user", "ClaveSegura123!"))
+		mockMvc.perform(patch("/api/arco/oposicion").header("Authorization", bearer)
 				.contentType(MediaType.APPLICATION_JSON).content("{\"oposicionAlTratamiento\":true}"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.oposicionAlTratamiento").value(true));
-		mockMvc.perform(delete("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
+		mockMvc.perform(delete("/api/arco/perfil").header("Authorization", bearer))
 				.andExpect(status().isNoContent());
-		mockMvc.perform(get("/api/arco/perfil").with(httpBasic("arco-user", "ClaveSegura123!")))
-				.andExpect(status().isUnauthorized());
+		mockMvc.perform(get("/api/arco/perfil").header("Authorization", bearer))
+				.andExpect(status().isNotFound());
 	}
 
 	private String productoJson(String nombre, long categoriaId, long proveedorId) {
