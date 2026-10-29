@@ -28,7 +28,11 @@ public class AuthController {
 
 	@PostMapping("/registro")
 	@ResponseStatus(HttpStatus.CREATED)
-	public UsuarioPersonalController.PerfilResponse registrar(@Valid @RequestBody RegistroRequest request) {
+	public synchronized UsuarioPersonalController.PerfilResponse registrar(@Valid @RequestBody RegistroRequest request) {
+		if (repository.count() > 0) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "El registro inicial ya se realizó");
+		}
+
 		String username = request.username().trim().toLowerCase();
 		String email = request.email().trim().toLowerCase();
 		if (repository.existsByUsername(username) || repository.existsByEmail(email)) {

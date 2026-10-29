@@ -17,9 +17,9 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers("/api/auth/registro", "/h2-console/**").permitAll()
-						.requestMatchers("/api/auth/login", "/api/arco/**").authenticated()
-						.anyRequest().permitAll())
+						.requestMatchers("/api/auth/registro", "/api/auth/login").permitAll()
+						.requestMatchers("/api/**").authenticated()
+						.anyRequest().denyAll())
 				.httpBasic(Customizer.withDefaults())
 				.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
 		return http.build();

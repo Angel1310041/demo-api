@@ -13,6 +13,7 @@
     ]
   },
   "variable": [
+    { "key": "baseUrl", "value": "http://inventario.uttec" },
     { "key": "arcoUsername", "value": "" },
     { "key": "arcoPassword", "value": "" },
     { "key": "arcoEmail", "value": "" }
@@ -31,7 +32,7 @@
               "mode": "raw",
               "raw": "{\n  \"username\": \"{{arcoUsername}}\",\n  \"password\": \"{{arcoPassword}}\",\n  \"nombreCompleto\": \"Usuario de prueba\",\n  \"email\": \"{{arcoEmail}}\",\n  \"telefono\": \"5551234\",\n  \"domicilio\": \"Calle de prueba 123\"\n}"
             },
-            "url": "http://localhost:8080/api/auth/registro"
+            "url": "{{baseUrl}}/api/auth/registro"
           }
         },
         {
@@ -39,7 +40,7 @@
           "request": {
             "method": "POST",
             "header": [],
-            "url": "http://localhost:8080/api/auth/login"
+            "url": "{{baseUrl}}/api/auth/login"
           }
         }
       ]
@@ -56,7 +57,7 @@
       "item": [
         {
           "name": "A. Acceso: consultar mi perfil",
-          "request": { "method": "GET", "url": "http://localhost:8080/api/arco/perfil" }
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/arco/perfil" }
         },
         {
           "name": "R. Rectificación: actualizar mis datos",
@@ -67,7 +68,7 @@
               "mode": "raw",
               "raw": "{\n  \"nombreCompleto\": \"Usuario rectificado\",\n  \"email\": \"{{arcoEmail}}\",\n  \"telefono\": \"5559999\",\n  \"domicilio\": \"Nuevo domicilio 456\"\n}"
             },
-            "url": "http://localhost:8080/api/arco/perfil"
+            "url": "{{baseUrl}}/api/arco/perfil"
           }
         },
         {
@@ -76,16 +77,16 @@
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{\"oposicionAlTratamiento\":true}" },
-            "url": "http://localhost:8080/api/arco/oposicion"
+            "url": "{{baseUrl}}/api/arco/oposicion"
           }
         },
         {
           "name": "Verificar oposición registrada",
-          "request": { "method": "GET", "url": "http://localhost:8080/api/arco/perfil" }
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/arco/perfil" }
         },
         {
           "name": "C. Cancelación: eliminar mi cuenta (irreversible)",
-          "request": { "method": "DELETE", "url": "http://localhost:8080/api/arco/perfil" }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/arco/perfil" }
         }
       ]
     }

@@ -1,0 +1,3 @@
+http://inventario.uttec {
+    reverse_proxy localhost:8080
+}
